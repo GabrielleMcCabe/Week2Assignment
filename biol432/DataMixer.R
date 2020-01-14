@@ -3,6 +3,7 @@
 MData <- read.csv("Data/measurements.csv", header = TRUE)
 
 #Step 2
+#Converting all limb width values into cm and saving them in a new column. 
 MData$Limb.Width.cm <- MData$Limb.Width
 for(i in 1:length(MData$Limb.Width.cm)) {
   if(MData$unitsW[i] == "mm") {
@@ -10,6 +11,7 @@ for(i in 1:length(MData$Limb.Width.cm)) {
   } 
 }
 
+#Converting all limb length values into cm and saving them in a new column.
 MData$Limb.Length.cm <- MData$Limb.Length 
 for(i in 1:length(MData$Limb.Length.cm)) {
   if(MData$unitsL[i] == "mm") {
@@ -40,6 +42,7 @@ theme_pubworthy <- function (base_size = 12, base_family = "") {
     ) 
 }
 
+#Used width and length columns that had the same units.
 qplot(x = Limb.Width.cm, y = Limb.Length.cm, data = MData, size = I(5),
       xlab = "Limb Width (cm)", ylab = "Limb Length (cm)") + theme_pubworthy()
 

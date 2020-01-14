@@ -12,6 +12,7 @@ Limb.Width <- c(rnorm(10, mean = 10, sd = 10))
 Limb.Width <- abs(Limb.Width)
 
 #Step 7
+#Randomly selected 0 and 1 from binomial distribution then coverted 0 to mm and 1 to cm. 
 unitsW <- c(rbinom(10, size = 1, prob = 0.5))
 for(i in 1:length(unitsW)) {
   if(unitsW[i] == "0") {
@@ -26,6 +27,7 @@ Limb.Length <- c(rnorm(10, mean = 100, sd = 100))
 Limb.Length <- abs(Limb.Length)
 
 #Step 9
+#Randomly selected 0 and 1 from binomial distribution then coverted 0 to mm and 1 to cm.
 unitsL <- c(rbinom(10, size = 1, prob = 0.5))
 for(i in 1:length(unitsL)) {
   if(unitsL[i] == "0") {
