@@ -19,7 +19,7 @@ for(i in 1:length(MData$Limb.Length.cm)) {
   } 
 }
 
-MData$Volume <- MData$Limb.Width.cm * MData$Limb.Length.cm  #Assuming limb volume = length * width 
+MData$Volume <- pi * (MData$Limb.Width.cm / 2) ^ 2 * MData$Limb.Length.cm  #Assuming limb volume = pi * (width/2)^2 * length 
 
 #Part III
 library(ggplot2)
