@@ -1,0 +1,156 @@
+---
+title: "DataAnalysis"
+author: "Gabrielle McCabe"
+date: "20/01/2020"
+output: html_document
+---
+
+# Read and Manipulate Measurements Data
+
+Import dplyr and ggplot2 and read measurements.csv.
+
+```{r, echo = F}
+library("dplyr")
+library("ggplot2")
+
+MData <- read.csv("Data/measurements.csv", header = TRUE)
+```
+
+
+Change the column names to shorter, 3-letter abbreviations. Spp: species. LbW: limb width. UtW: units for width. LbL: limb length. UtL: units for length. 
+
+```{r}
+MData <- rename(MData, Spp = Organism, LbW = Limb.Width, UtW = unitsW, 
+                LbL = Limb.Length, UtL = unitsL)
+```
+
+
+Convert all limb width and limb length values to centimetres and save them in 2 new columns (LWc: limb length cm; LLc: limb length cm).
+
+```{r}
+MData$LWc <- MData$LbW
+for(i in 1:length(MData$LWc)) {
+  if(MData$UtW[i] == "mm") {
+    MData$LWc[i] <- MData$LbW[i] / 10
+  } 
+}
+
+MData$LLc <- MData$LbL 
+for(i in 1:length(MData$LLc)) {
+  if(MData$UtL[i] == "mm") {
+    MData$LLc[i] <- MData$LbL[i] / 10
+  } 
+}
+```
+
+
+Create new column called Volume that calculates limb volume as: 
+$$LimbVolume = pi * (width/2)^2 * length$$
+
+```{r}
+MData <- mutate(MData, Volume = pi * (LWc / 2) ^ 2 * LLc)
+```
+
+
+# Plots
+
+Relationship between limb width (cm) and limb length (cm). Using the clean theme for presentations and publications used in the Colautti Lab.
+
+```{r}
+theme_pubworthy <- function (base_size = 12, base_family = "") {
+  theme_classic(base_size = base_size, base_family = base_family) %+replace% 
+    theme(
+      axis.text = element_text(colour = "black"),
+      axis.title.x = element_text(size=18),
+      axis.text.x = element_text(size=12),
+      axis.title.y = element_text(size=18,angle=90),
+      axis.text.y = element_text(size=12),
+      axis.ticks = element_blank(), 
+      panel.background = element_rect(fill="white"),
+      panel.border = element_blank(),
+      plot.title=element_text(face="bold", size=24),
+      legend.position="none"
+    ) 
+}
+
+qplot(x = LWc, y = LLc, data = MData, size = I(5), alpha = I(0.6),
+      xlab = "Limb Width (cm)", ylab = "Limb Length (cm)") + theme_pubworthy()
+```
+
+
+Relationship between limb width (cm) and limb length (cm) for species that have above average volume.
+
+```{r}
+Above.Avg.Spp <- filter(MData, Volume > mean(Volume))
+
+qplot(x = LWc, y = LLc, data = Above.Avg.Spp, size = I(5),
+      xlab = "Limb Width (cm)", ylab = "Limb Length (cm)") + theme_pubworthy()
+```
+
+
+# Table
+
+First, I will filter out all the species and volume of species with below-average volume.
+
+```{r}
+Below.Avg.Spp <- MData %>% 
+  filter(Volume < mean(Volume)) %>% 
+  select(Spp, Volume)
+Below.Avg.Spp
+```
+
+
+This table shows only species and volume for only the species with below-average volume.
+
+Species | Volume
+--- | ---
+Felis catus | 11.28817
+Mus musculus | 181.25198
+Ateles fusciceps | 54.92002		
+Bradypus tridactylus | 448.44593		
+Pterois volitans | 83.73672		
+Camelus dromedarius | 213.83794		
+Ornithorhynchus anatinus | 1773.87773		
+Pongo abelii | 183.27048	
+
+
+# Grouping data
+
+Add Habitat column. Set the seed (so the same random numbers are chosen) and randomly select 0 and 1 from binomial distribution then convert 0 to land and 1 to sea. 
+
+```{r}
+set.seed(3)
+MData <- mutate(MData, Hab = rbinom(10, size = 1, prob = 0.5))
+
+for(i in 1:length(MData$Hab)) {
+  if(MData$Hab[i] == "0") {
+    MData$Hab[i] <- "land"
+    } else {
+      MData$Hab[i] <- "sea"
+      }
+}
+```
+
+
+Summarize the mean and standard deviation of limb length (cm), limb width (cm), and volume for each of the habitat groups.
+
+```{r}
+MData %>% 
+  group_by(Hab) %>% 
+  summarise(Mean.Length = mean(LLc), SD.Length = sd(LLc), 
+            Mean.Width = mean(LWc), SD.Width = sd(LWc),
+            Mean.Volume = mean(Volume), SD.Volume = sd(Volume))
+```
+
+This table shows the mean and standard deviation (SD) of limb length (cm), limb width (cm), and volume for each of the habitat groups. 
+
+Habitat | Mean Limb Length (cm) | SD Limb Length (cm) | Mean Limb Width (cm) | SD Limb Width (cm) | Mean Volume | SD Volume
+--- | --- | --- | --- | --- | --- | ---
+land | 105.6568 | 130.3758 | 4.920396 | 3.925232 | 5125.103 | 10205.79
+sea | 112.6543 | 102.7764 | 7.224463 | 9.726004 | 19957.470 | 44256.16
+
+
+
+
+
+
