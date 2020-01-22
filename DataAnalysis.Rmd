@@ -7,9 +7,9 @@ output: html_document
 
 # Read and Manipulate Measurements Data
 
-Import dplyr and ggplot2 and read measurements.csv.
+Import dplyr and ggplot2 and read measurements.csv. This data set has a list of 10 different species, each with a limb width value and limb length value, in either millimeters or centimeters.
 
-```{r, echo = F}
+```{r}
 library("dplyr")
 library("ggplot2")
 
@@ -78,7 +78,7 @@ qplot(x = LWc, y = LLc, data = MData, size = I(5), alpha = I(0.6),
 ```
 
 
-Relationship between limb width (cm) and limb length (cm) for species that have above average volume.
+Relationship between limb width (cm) and limb length (cm) for species that have above average volume. First, I filtered out the data for species with above average volume, saved it in Above.Avg.Spp and used that data for my plot.
 
 ```{r}
 Above.Avg.Spp <- filter(MData, Volume > mean(Volume))
@@ -88,11 +88,11 @@ qplot(x = LWc, y = LLc, data = Above.Avg.Spp, size = I(5),
 ```
 
 
-# Table
+# Table 1
 
-First, I will filter out all the species and volume of species with below-average volume.
+First, I filtered out all the species with below average volumes. Then from those species I selected only the Spp and Volume columns and saved that in Below.Avg.Spp. I set echo = T and results = "hide" so that the output of Below.Avg.Spp would not be displayed on the .html but so I could still see it in the .Rmd in order to produce the table below. 
 
-```{r}
+```{r, echo = T, results = "hide"}
 Below.Avg.Spp <- MData %>% 
   filter(Volume < mean(Volume)) %>% 
   select(Spp, Volume)
@@ -114,9 +114,9 @@ Ornithorhynchus anatinus | 1773.87773
 Pongo abelii | 183.27048	
 
 
-# Grouping data
+# Grouping Data and Table 2
 
-Add Habitat column. Set the seed (so the same random numbers are chosen) and randomly select 0 and 1 from binomial distribution then convert 0 to land and 1 to sea. 
+I added a Habitat column. First, I set the seed so the same random numbers are chosen. Then, I randomly selected 0 and 1 from a binomial distribution and converted 0 to land and 1 to sea. 
 
 ```{r}
 set.seed(3)
@@ -125,16 +125,16 @@ MData <- mutate(MData, Hab = rbinom(10, size = 1, prob = 0.5))
 for(i in 1:length(MData$Hab)) {
   if(MData$Hab[i] == "0") {
     MData$Hab[i] <- "land"
-    } else {
+  } else {
       MData$Hab[i] <- "sea"
-      }
+    }
 }
 ```
 
 
-Summarize the mean and standard deviation of limb length (cm), limb width (cm), and volume for each of the habitat groups.
+I Summarized the mean and standard deviation of limb length (cm), limb width (cm), and volume for each of the habitat groups.I set echo = T and results = "hide" so that the output of MData would not be displayed on the .html but so I could still see it in the .Rmd in order to produce the table below.
 
-```{r}
+```{r, echo = T, results = "hide"}
 MData %>% 
   group_by(Hab) %>% 
   summarise(Mean.Length = mean(LLc), SD.Length = sd(LLc), 
