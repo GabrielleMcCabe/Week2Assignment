@@ -1,0 +1,50 @@
+---
+title: "Regex"
+author: "Gabrielle McCabe"
+date: "27/01/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+I imported dplyr and ggplot2 and read measurements.csv into MData. I included warning = FALSE and message = FALSE so that the warning messages from library("dplyr") did not show in the html.
+
+```{r, warning = FALSE, message = FALSE}
+library("dplyr")
+
+MData <- read.csv("Data/measurements.csv", header = TRUE)
+```
+
+
+I added a new column called Sp that modified the Species names (in the Organism column) with only the first letter and a period. I modified the names by using the regular expression sub() to find and replace each species name in the Organism column with the first letter and a period, and then I used the dplyr command mutate() to add this column to MData. 
+
+```{r}
+MData <- mutate(MData, Sp = c(sub("Felis", "F.", Organism[1]), sub("Mus", "M.", Organism[2]), sub("Ateles", "A.", Organism[3]), sub("Bradypus", "B.", Organism[4]), sub("Pterois", "P.", Organism[5]), sub("Camelus", "C.", Organism[6]), sub("Ornithorhynchus", "O.", Organism[7]), sub("Canis", "C.", Organism[8]), sub("Pongo", "P.", Organism[9]), sub("Panthera", "P.", Organism[10])))
+
+MData
+```
+
+
+I created a new dataset (spMData) containing only  the Sp column, moving it to the beginning in place of the original Organism column. I used the dplyr select() to rearrange MData, putting the species column first and then the remaining columns (Limb.Width, unitsW, Limb.Length, then unitsL), excluding Organism.
+
+```{r}
+spMData <- select(MData, Sp, Limb.Width : unitsL)
+spMData
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
